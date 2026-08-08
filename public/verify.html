@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Prophixy Verification</title>
+
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+  <div class="container">
+
+    <img src="/images/prophixy-logo.png" class="logo">
+
+    <h1>Prophixy Verification</h1>
+
+    <p id="discordStatus" class="subtitle">
+      Discord login successful.
+    </p>
+
+    <p id="username"></p>
+
+    <button id="connectButton">
+      🔗 Connect Wallet
+    </button>
+
+    <div id="status">
+      Connect your wallet to verify your Prophixy SBT.
+    </div>
+
+    <div class="footer">
+      Shape Africa's Future
+    </div>
+
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/ethers@6/dist/ethers.umd.min.js"></script>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+
+    const discordId = params.get("discordId");
+    const username = params.get("username");
+
+    const status = document.getElementById("status");
+    const usernameElement = document.getElementById("username");
+    const connectButton = document.getElementById("connectButton");
+
+    if (!discordId) {
+      status.textContent = "Discord login required.";
+      connectButton.disabled = true;
+    } else {
+      usernameElement.textContent =
+        "Discord: " + (username || discordId);
+    }
+
+    connectButton.addEventListener("click", async () => {
+
+      if (!discordId) {
+        alert("Please login with Discord first.");
+        return;
+      }
+
+      if (!window.ethereum) {
+        alert("Please install or open a wallet such as MetaMask or Phantom.");
+        return;
+      }
+
+      try {
+
+        status.textContent = "Connecting wallet...";
+
+        const provider =
+          new ethers.BrowserProvider(window.ethereum);
+
+        await provider.send("eth_requestAccounts", []);
+
+        const signer = await provider.getSigner();
+
+        const wallet = await signer.getAddress();
+
+        status.textContent =
+          "Checking your Prophixy SBT...";
+
+        const response = await fetch(
+          `/verify/${encodeURIComponent(wallet)}?discordId=${encodeURIComponent(discordId)}`
+        );
+
+        const data = await response.json();
+
+        console.log("Verification result:", data);
+
+        if (data.success && data.minted) {
+
+          status.textContent =
+            `✅ Verified! Role: ${data.role}`;
+
+          alert(
+            `Verification successful!\n\nSBT Role: ${data.role}`
+          );
+
+        } else if (data.success && !data.minted) {
+
+          status.textContent =
+            "❌ This wallet does not have a Prophixy SBT.";
+
+          alert(
+            "This wallet does not have a Prophixy SBT."
+          );
+
+        } else {
+
+          status.textContent =
+            data.message || "Verification failed.";
+
+          alert(
+            data.message || "Verification failed."
+          );
+        }
+
+      } catch (error) {
+
+        console.error(error);
+
+        status.textContent =
+          "❌ Wallet verification failed.";
+
+        alert(
+          "Could not complete wallet verification."
+        );
+      }
+
+    });
+  </script>
+
+</body>
+</html>
