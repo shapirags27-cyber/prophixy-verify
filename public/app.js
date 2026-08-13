@@ -14,24 +14,38 @@ async function checkDiscordSession() {
 
         const data = await response.json();
 
-        if (!data.loggedIn) {
+      if (!data.loggedIn) {
 
-            discordUser = null;
+    discordUser = null;
 
-            updateStatus(
-                "Please login with Discord first."
-            );
+    const discordLogin =
+        document.getElementById("discordLogin");
 
-            return false;
-        }
+    if (discordLogin) {
+        discordLogin.style.display = "block";
+    }
 
-        discordUser = data;
+    updateStatus(
+        "Please login with Discord first."
+    );
 
-        updateStatus(
-            `Discord connected: ${data.username}`
-        );
+    return false;
+}
 
-        return true;
+       discordUser = data;
+
+const discordLogin =
+    document.getElementById("discordLogin");
+
+if (discordLogin) {
+    discordLogin.style.display = "none";
+}
+
+updateStatus(
+    `Discord connected: ${data.username}`
+);
+
+return true;
 
     } catch (error) {
 
