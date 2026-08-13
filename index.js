@@ -407,10 +407,17 @@ app.get(
                                 discordId,
 
                             roleName:
-                                role
+                                role,
+
+                            wallet:
+                                wallet
                         },
 
                         {
+                            headers: {
+                                "X-Verify-Secret":
+                                    process.env.VERIFY_API_SECRET
+                            },
                             timeout: 15000
                         }
                     );
