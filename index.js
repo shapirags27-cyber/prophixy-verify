@@ -10,6 +10,7 @@ const { ethers } = require("ethers");
 const abi = require("./abi");
 
 const app = express();
+app.set("trust proxy", 1);
 
 // ================================
 // MIDDLEWARE
@@ -32,12 +33,12 @@ app.use(
 
         saveUninitialized: false,
 
-        cookie: {
-            secure: process.env.NODE_ENV === "production",
-            httpOnly: true,
-            sameSite: "lax",
-            maxAge: 7 * 24 * 60 * 60 * 1000
-        }
+      cookie: {
+    secure: true,
+    httpOnly: true,
+    sameSite: "lax",
+    maxAge: 7 * 24 * 60 * 60 * 1000
+}
     })
 );
 
@@ -213,9 +214,9 @@ app.get(
                     discordUser.id
                 );
 
-                res.redirect(
-                    "/verify.html"
-                );
+               res.redirect(
+    "/"
+);
             });
 
         } catch (error) {
